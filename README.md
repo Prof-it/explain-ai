@@ -41,7 +41,7 @@ Building upon our understanding of model interpretability, we've developed an in
 - Integration with Microsoft's Phi-2 language model
 
 ### Demo
-![Loan Approval RAG Demo](loan_approval_rag/streamlit-app-2025-05-25-01-05-27.webm)
+![Loan Approval RAG Demo](loan_approval_rag/streamlit-app.webm)
 
 ### Setup & Usage
 ```bash

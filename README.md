@@ -41,7 +41,9 @@ Building upon our understanding of model interpretability, we've developed an in
 - Integration with Microsoft's Phi-2 language model
 
 ### Demo
-![Loan Approval RAG Demo](loan_approval_rag/streamlit-app.webm)
+![Loan Approval RAG Demo](loan_approval_rag/streamlit-app.gif)
+
+[▶️ Download the original demo video (.webm)](loan_approval_rag/streamlit-app.webm)
 
 ### Setup & Usage
 ```bash
@@ -77,4 +79,4 @@ This repository showcases the evolution of AI in loan approval systems:
 
 ## Note
 
-This repository is part of a book project demonstrating the practical evolution of AI systems, from explainable models to intelligent assistants. Each component is designed to showcase best practices in both technical implementation and user experience. 
+This repository is part of a book project demonstrating the practical evolution of AI systems, from explainable models to intelligent assistants. Each component is designed to showcase best practices in both technical implementation and user experience.

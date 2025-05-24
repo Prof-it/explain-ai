@@ -1,0 +1,11 @@
+
+Credit Score Requirements:
+- Excellent (750+): Automatically qualifies for best rates
+- Good (700-749): Generally approved with standard rates
+- Fair (650-699): May require additional documentation
+- Poor (below 650): High risk, typically declined
+- Below 600: Automatic rejection
+
+Explanation of Credit Score Impact:
+High credit scores demonstrate reliable payment history and responsible credit management. 
+Low scores indicate higher risk of default based on past credit behavior.

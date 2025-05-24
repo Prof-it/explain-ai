@@ -1,0 +1,11 @@
+
+Loan Approval Process:
+1. Initial application review
+2. Credit score check
+3. Income verification
+4. Employment history review
+5. Debt ratio calculation
+6. Final decision
+
+All criteria must be met for approval. Failing any single criterion may result in rejection.
+Borderline cases may be approved with additional conditions or higher rates.

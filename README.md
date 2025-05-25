@@ -90,21 +90,22 @@ The architecture of the RAG-based Intelligent Loan Approval Assistant is as foll
 
 ```mermaid
 flowchart TD
-    A[User Interface<br/>Streamlit] <--> B[RAG Pipeline]
-    D[Domain Knowledge<br/>Loan Documents] --> C[Retriever<br/>FAISS + Embeddings]
-    B --> C
-    C --> E[Generator<br/>Phi-2 LLM]
-    E --> F[Final Answer<br/>Loan Decision + Explanation]
-    B --> F
-    
-    subgraph Retrieval
-    D --> |Indexed & Embedded|C
-    end
-    
-    subgraph Generation
-    C --> |Retrieved Context|E
-    E --> |Generated Response|F
-    end
+    style UI fill:#e3f6fc,stroke:#38b6ff,stroke-width:2px
+    style FILES fill:#f9f9f9,stroke:#bdbdbd,stroke-width:2px
+    style LLM fill:#fffbe7,stroke:#f9d923,stroke-width:3px
+    style DOCS fill:#f0e6fa,stroke:#a259d9,stroke-width:2px
+
+    UI([👤<br/>User<br/>Interface])
+    FILES([🗂️<br/>User<br/>Files])
+    DOCS([📄<br/>Domain<br/>Knowledge])
+    LLM([🧠<br/>AI Model])
+
+    %% Step flows
+    UI -- "1️⃣ Provide Files" --> FILES
+    FILES -- "2️⃣ Indexed & Embedded" --> DOCS
+    UI -- "3️⃣ Application & Questions" --> LLM
+    DOCS -- "4️⃣ Relevant Info" --> LLM
+    LLM -- "5️⃣ Decision & Explanation" --> UI
 ```
 
 The diagram shows the key components and data flow of our RAG-based loan approval system:

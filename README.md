@@ -55,6 +55,65 @@ pip install -r requirements.txt
 streamlit run src/app.py
 ```
 
+### Architecture
+
+The architecture of the RAG-based Intelligent Loan Approval Assistant is as follows:
+
+```
++----------------------+     +------------------+     +----------------------+
+|    User Interface    |     |   RAG Pipeline   |     |   Domain Knowledge   |
+|      (Streamlit)     |<--->|   Coordinator    |     |   Loan Documents     |
++----------------------+     +------------------+     +----------------------+
+                                     |                           |
+                                     v                           v
+                            +------------------+     +----------------------+
+                            |    Retriever     |<----| Document Indexing &  |
+                            | FAISS + Sentence |     | Embedding Process   |
+                            |   Transformers   |     +----------------------+
+                            +------------------+
+                                     |
+                                     v
+                            +------------------+
+                            |    Generator     |
+                            |    (Phi-2 LLM)   |
+                            +------------------+
+                                     |
+                                     v
+                            +------------------+
+                            |  Final Answer    |
+                            | Loan Decision &  |
+                            |   Explanation    |
+                            +------------------+
+```
+
+### Architecture (Mermaid Diagram)
+
+```mermaid
+flowchart TD
+    A[User Interface<br/>Streamlit] <--> B[RAG Pipeline]
+    D[Domain Knowledge<br/>Loan Documents] --> C[Retriever<br/>FAISS + Embeddings]
+    B --> C
+    C --> E[Generator<br/>Phi-2 LLM]
+    E --> F[Final Answer<br/>Loan Decision + Explanation]
+    B --> F
+    
+    subgraph Retrieval
+    D --> |Indexed & Embedded|C
+    end
+    
+    subgraph Generation
+    C --> |Retrieved Context|E
+    E --> |Generated Response|F
+    end
+```
+
+The diagram shows the key components and data flow of our RAG-based loan approval system:
+1. **Domain Knowledge**: Loan documents are indexed and embedded
+2. **Retrieval**: FAISS retrieves relevant context based on user queries
+3. **Generation**: Phi-2 LLM generates responses using retrieved context
+4. **Pipeline**: Coordinates the flow between components
+5. **User Interface**: Streamlit web app for user interaction
+
 ## Project Evolution
 
 This repository showcases the evolution of AI in loan approval systems:

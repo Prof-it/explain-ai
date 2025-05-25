@@ -1,0 +1,16 @@
+flowchart TD
+    A[User Interface<br/>Streamlit] <--> B[RAG Pipeline]
+    D[Domain Knowledge<br/>Loan Documents] --> C[Retriever<br/>FAISS + Embeddings]
+    B --> C
+    C --> E[Generator<br/>Phi-2 LLM]
+    E --> F[Final Answer<br/>Loan Decision + Explanation]
+    B --> F
+    
+    subgraph Retrieval
+    D --> |Indexed & Embedded|C
+    end
+    
+    subgraph Generation
+    C --> |Retrieved Context|E
+    E --> |Generated Response|F
+    end

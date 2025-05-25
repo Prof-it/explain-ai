@@ -94,7 +94,8 @@ def main():
                 # Helper function to format criteria status
                 def format_criteria(name, status):
                     if status is None:
-                        return f"⚫ {name} (not checked in decision path)"
+                        # Use a white circle (⚪) to indicate "not checked"
+                        return f"⚪ {name} (not checked in decision path)"
                     elif status:
                         return f"✅ {name} meets requirements"
                     else:

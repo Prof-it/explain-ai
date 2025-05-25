@@ -52,7 +52,7 @@ cd loan_approval_rag
 pip install -r requirements.txt
 
 # Run the Streamlit app
-streamlit run src/app.py
+streamlit run src/app.py --server.fileWatcherType none
 ```
 
 ### Architecture

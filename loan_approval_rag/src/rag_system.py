@@ -84,32 +84,52 @@ class LoanApprovalSystem:
             
         return text
 
-    def setup_explanation_model(self):
-        """Initialize the explanation model - using BLOOMZ-1b7 for better reasoning with smaller footprint."""
-        model_name = "bigscience/bloomz-1b7"
+    # def setup_explanation_model(self):
+    #     """Initialize the explanation model - using BLOOMZ-1b7 for better reasoning with smaller footprint."""
+    #     model_name = "bigscience/bloomz-1b7"
         
+    #     tokenizer = AutoTokenizer.from_pretrained(model_name)
+    #     model = AutoModelForCausalLM.from_pretrained(
+    #         model_name,
+    #         device_map="auto",
+    #         torch_dtype=torch.float32
+    #     )
+        
+    #     # Configure pipeline for text generation
+    #     self.pipeline = pipeline(
+    #         task="text-generation",
+    #         model=model,
+    #         tokenizer=tokenizer,
+    #         max_new_tokens=200,     # Control new token generation
+    #         temperature=0.7,        # Moderate randomness
+    #         top_k=50,              # Limit vocabulary choices
+    #         num_beams=3,           # Beam search for coherent output
+    #         early_stopping=True,    # Stop when complete
+    #         num_return_sequences=1,
+    #         pad_token_id=tokenizer.eos_token_id,
+    #         eos_token_id=tokenizer.eos_token_id
+    #     )
+    def setup_explanation_model(self):
+        model_name = "microsoft/phi-2"  # or "microsoft/phi-3-mini-4k-instruct"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
             torch_dtype=torch.float32
         )
-        
-        # Configure pipeline for text generation
         self.pipeline = pipeline(
             task="text-generation",
             model=model,
             tokenizer=tokenizer,
-            max_new_tokens=200,     # Control new token generation
-            temperature=0.7,        # Moderate randomness
-            top_k=50,              # Limit vocabulary choices
-            num_beams=3,           # Beam search for coherent output
-            early_stopping=True,    # Stop when complete
+            max_new_tokens=200,
+            temperature=0.7,
+            top_k=50,
+            num_beams=3,
+            early_stopping=True,
             num_return_sequences=1,
             pad_token_id=tokenizer.eos_token_id,
             eos_token_id=tokenizer.eos_token_id
         )
-
     def normalize_features(self, features: dict) -> np.ndarray:
         """Normalize features using training data parameters."""
         normalized = []
@@ -177,14 +197,12 @@ class LoanApprovalSystem:
         return rules
 
     def generate_explanation(self, decision_path: list, features: dict, is_approved: bool) -> str:
-        """Generate human-readable explanation using the decision path."""
+        if is_approved:
+            return "Congratulations! Your loan application has been approved. Please contact our loan department to proceed with the next steps."
         if not decision_path:
             return "We regret to inform you that your loan application cannot be approved at this time."
 
-        # Build explanation from decision path
-        explanation_parts = []
-        
-        # Format feature values consistently
+        # Format feature values and names consistently
         def format_value(feature: str, value: float) -> str:
             if feature == 'credit_score':
                 return f"{value:.0f}"
@@ -196,7 +214,6 @@ class LoanApprovalSystem:
                 return f"${value:,.0f}"
             return str(value)
 
-        # Format feature names consistently
         def format_feature(feature: str) -> str:
             if feature == 'years_employed':
                 return 'employment history'
@@ -204,7 +221,8 @@ class LoanApprovalSystem:
                 return 'debt-to-income ratio'
             return feature.replace('_', ' ')
 
-        # Build explanation based on decision path
+        # Build path description for LLM
+        path_info = []
         for i, rule in enumerate(decision_path):
             feature = rule['feature']
             value = rule['actual']
@@ -214,33 +232,106 @@ class LoanApprovalSystem:
             formatted_value = format_value(feature, value)
             formatted_feature = format_feature(feature)
             
-            if is_approved or not is_last:
-                explanation_parts.append(f"{formatted_feature} of {formatted_value}")
-            else:  # Rejection reason (last rule in path)
+            if not is_last:
+                path_info.append(f"PASSED: {formatted_feature} of {formatted_value}")
+            else:  # Rejection reason
                 if operation == '>':
-                    explanation_parts.append(f"{formatted_feature} of {formatted_value} is insufficient")
+                    path_info.append(f"FAILED: {formatted_feature} of {formatted_value} (needs to be lower)")
                 elif operation == '<=':
-                    explanation_parts.append(f"{formatted_feature} of {formatted_value} is too high")
-                else:
-                    explanation_parts.append(f"{formatted_feature} of {formatted_value} is outside our criteria")
+                    path_info.append(f"FAILED: {formatted_feature} of {formatted_value} (needs to be higher)")
 
-        # Construct the final explanation
-        if is_approved:
-            if explanation_parts:
-                explanation = "Congratulations! Your loan application has been approved based on your " + ", and your ".join(explanation_parts)
-                explanation += ". Please contact our loan department to proceed with the next steps."
-            else:
-                explanation = "Congratulations! Your loan application has been approved. Please contact our loan department to proceed with the next steps."
+
+        # Only explain the last failed node
+        # fail_info = []
+        # if decision_path:
+        #     last_rule = decision_path[-1]
+        #     feature = last_rule['feature']
+        #     value = last_rule['actual']
+        #     operation = last_rule['operation']
+        #     formatted_value = format_value(feature, value)
+        #     formatted_feature = format_feature(feature)
+        #     if operation == '>':
+        #         fail_info = f"{formatted_feature} of {formatted_value} is too low."
+        #     elif operation == '<=':
+        #         fail_info = f"{formatted_feature} of {formatted_value} is too high."
+        #     else:
+        #         fail_info = f"{formatted_feature} of {formatted_value} did not meet the requirement."
+        # else:
+        #     fail_info = "Unknown reason."
+
+        # Build a readable path string for the LLM
+        path_str = "\n".join(path_info)
+
+        last_failed = path_info[-1].replace("FAILED: ", "")
+        # Remove the value, keep only the feature and direction
+        if "credit score" in last_failed and "higher" in last_failed:
+            reason = "credit score is too low"
+        elif "income" in last_failed and "higher" in last_failed:
+            reason = "income is too low"
+        elif "debt-to-income ratio" in last_failed and "lower" in last_failed:
+            reason = "debt-to-income ratio is too high"
+        elif "employment history" in last_failed and "higher" in last_failed:
+            reason = "employment history is too short"
         else:
-            if len(explanation_parts) > 1:
-                passed_criteria = explanation_parts[:-1]
-                failing_criterion = explanation_parts[-1]
-                explanation = "We regret to inform you that your loan application cannot be approved at this time. "
-                explanation += f"While you have acceptable {', '.join(passed_criteria)}, your {failing_criterion}."
-            else:
-                explanation = f"We regret to inform you that your loan application cannot be approved at this time because your {explanation_parts[0]}."
+            reason = last_failed
 
-        return explanation
+        prompt = (
+            f"Write a polite, single-sentence explanation for a loan rejection due to {reason}. "
+            "Do not mention any minimum, maximum, or required value. "
+            "Instead, suggest how the applicant could improve this aspect for future applications."
+        )
+
+        try:
+            assert self.pipeline is not None and self.pipeline.tokenizer is not None, "Pipeline or tokenizer not loaded"
+            result = self.pipeline(
+                prompt,
+                max_new_tokens=100,
+                temperature=0.7,
+                top_p=0.9,
+                do_sample=True,
+                num_return_sequences=1,
+                pad_token_id=self.pipeline.tokenizer.eos_token_id,
+                eos_token_id=self.pipeline.tokenizer.eos_token_id
+            )
+            if result is None:
+                raise RuntimeError("Pipeline returned None. Check pipeline initialization and input.")
+            outputs = list(result)
+            print("DEBUG: outputs[0] =", outputs[0], "type:", type(outputs[0]))
+
+            if isinstance(outputs[0], dict):
+                response = outputs[0].get('generated_text', str(outputs[0]))
+            else:
+                response = str(outputs[0])
+
+            explanation = response.strip()
+
+            # Remove prompt echo if present
+            if explanation.startswith(prompt):
+                explanation = explanation[len(prompt):].strip()
+
+            # Extract only the part after 'Output:'
+            if "Output:" in explanation:
+                explanation = explanation.split("Output:", 1)[1].strip()
+            elif "output:" in explanation:
+                explanation = explanation.split("output:", 1)[1].strip()
+
+            print("\nLLM Debug Info:")
+            print("Prompt:", prompt)
+            print("Raw Response:", response)
+            print("Final Explanation:", explanation)
+
+            return explanation
+
+        except Exception as e:
+            print(f"Error generating LLM explanation: {str(e)}")
+            # Fallback explanation if LLM fails
+            if len(path_info) > 1:
+                passed_parts = [p.replace("PASSED: ", "") for p in path_info[:-1]]
+                failed_part = path_info[-1].replace("FAILED: ", "").split(" (needs")[0]
+                return f"We regret to inform you that your loan application cannot be approved at this time. While you have acceptable {', '.join(passed_parts)}, your {failed_part}."
+            else:
+                failed_part = path_info[0].replace("FAILED: ", "").split(" (needs")[0]
+                return f"We regret to inform you that your loan application cannot be approved at this time because your {failed_part}."
 
     def get_loan_decision(self, credit_score: float, annual_income: float, 
                          debt_ratio: float, years_employed: float) -> dict:

@@ -2,8 +2,8 @@ import os
 
 def create_sample_documents(docs_dir: str):
     """Create sample loan approval documents."""
-    if not os.path.exists(docs_dir):
-        os.makedirs(docs_dir)
+    # Ensure the directory exists
+    os.makedirs(docs_dir, exist_ok=True)
 
     documents = {
         "credit_score_rules.txt": """
@@ -53,7 +53,10 @@ Borderline cases may be approved with additional conditions or higher rates.
     }
 
     for filename, content in documents.items():
-        with open(os.path.join(docs_dir, filename), 'w') as f:
-            f.write(content)
+        file_path = os.path.join(docs_dir, filename)
+        # Only write if file doesn't exist or is empty
+        if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+            with open(file_path, 'w') as f:
+                f.write(content)
 
     return docs_dir

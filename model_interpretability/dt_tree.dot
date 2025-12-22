@@ -1,0 +1,21 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", fontname="helvetica"] ;
+edge [fontname="helvetica"] ;
+0 [label=<Credit_Score &le; 0.461<br/>gini = 0.386<br/>samples = 800<br/>value = [591, 209]<br/>class = Nein>, fill] ;
+1 [label=<gini = 0.0<br/>samples = 538<br/>value = [538, 0]<br/>class = Nein>, fill] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label=<Debt_Ratio &le; 0.999<br/>gini = 0.323<br/>samples = 262<br/>value = [53, 209]<br/>class = Ja>, fill] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label=<Years_Employed &le; -1.045<br/>gini = 0.054<br/>samples = 215<br/>value = [6, 209]<br/>class = Ja>, fill] ;
+2 -> 3 ;
+4 [label=<Income &le; -0.531<br/>gini = 0.355<br/>samples = 26<br/>value = [6, 20]<br/>class = Ja>, fill] ;
+3 -> 4 ;
+5 [label=<gini = 0.0<br/>samples = 6<br/>value = [6, 0]<br/>class = Nein>, fill] ;
+4 -> 5 ;
+6 [label=<gini = 0.0<br/>samples = 20<br/>value = [0, 20]<br/>class = Ja>, fill] ;
+4 -> 6 ;
+7 [label=<gini = 0.0<br/>samples = 189<br/>value = [0, 189]<br/>class = Ja>, fill] ;
+3 -> 7 ;
+8 [label=<gini = 0.0<br/>samples = 47<br/>value = [47, 0]<br/>class = Nein>, fill] ;
+2 -> 8 ;
+}

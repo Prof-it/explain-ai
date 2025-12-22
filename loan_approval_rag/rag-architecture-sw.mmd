@@ -1,0 +1,17 @@
+flowchart TD
+    style UI fill:#ffffff,stroke:#000000,stroke-width:2px
+    style FILES fill:#cccccc,stroke:#000000,stroke-width:1px
+    style LLM fill:#888888,stroke:#ffffff,stroke-width:3px
+    style DOCS fill:#bbbbbb,stroke:#000000,stroke-width:2px
+
+    UI([User Interface])
+    FILES([/User Files/])
+    DOCS([/Domain Knowledge/])
+    LLM((AI Model))
+
+    %% Step flows
+    UI -- "1️⃣ Provide Files" --> FILES
+    FILES -- "2️⃣ Indexed & Embedded" --> DOCS
+    UI -- "3️⃣ Application & Questions" --> LLM
+    DOCS -- "4️⃣ Relevant Info" --> LLM
+    LLM -- "5️⃣ Decision & Explanation" --> UI

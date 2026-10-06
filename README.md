@@ -137,6 +137,24 @@ This repository showcases the evolution of AI in loan approval systems:
 - FAISS for vector storage
 - Sentence Transformers for embeddings
 
+## Citation
+
+If you use or reference this project as part of academic work or publications, please cite the following chapter from the book project:
+
+```bibtex
+@incollection{Lu2026Computer,
+  author    = {Tianxiang Lu},
+  title     = {Den Computer verstehen: Von Erklärbarkeit zu automatisiertem Reasoning},
+  booktitle = {Technologie und Organisation},
+  editor    = {Cornelia Reindl and Bernhard Wecke and Ulrich Irnich},
+  publisher = {Springer Gabler, Wiesbaden},
+  year      = {2026},
+  pages     = {17--32},
+  doi       = {10.1007/978-3-658-51511-9_2},
+  url       = {https://doi.org/10.1007/978-3-658-51511-9_2}
+}
+```
+
 ## Note
 
 This repository is part of a book project demonstrating the practical evolution of AI systems, from explainable models to intelligent assistants. Each component is designed to showcase best practices in both technical implementation and user experience.
